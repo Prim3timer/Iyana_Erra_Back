@@ -9,16 +9,20 @@ const createItem = asyncHandler(async (req, res) => {
     availableUnitMeasures,
     qty,
     denominator,
+    numerator,
     date,
     dateCreated,
   } = req.body;
+  const quntum = [Number(qty), numerator];
 
   const newItem = {
     name: req.body.name,
     availableUnitMeasures: req.body.availableUnitMeasures,
     availablePrices: req.body.availablePrices,
+    availableQuantities: quntum,
     qty,
     denominator,
+    numerator,
     date,
     dateCreated,
   };
@@ -40,16 +44,19 @@ const getAllItems = asyncHandler(async (req, res) => {
 
 const editItem = asyncHandler(async (req, res) => {
   const id = req.params.id;
+
   const {
     name,
     availablePrices,
     availableUnitMeasures,
+    availableQuantities,
     qty,
     denominator,
     numerator,
   } = req.body;
   console.log({ reqBody: req.body, id });
   const response = await Item.updateOne({ _id: id }, req.body);
+
   res.json("updated");
 });
 

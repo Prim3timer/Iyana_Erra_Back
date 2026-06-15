@@ -12,6 +12,9 @@ const itemSchema = new Schema({
   availablePrices: {
     type: Array,
   },
+  availableQuantities: {
+    type: Array,
+  },
   qty: {
     type: Number,
   },
