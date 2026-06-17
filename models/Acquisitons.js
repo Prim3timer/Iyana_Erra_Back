@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const acquisitionSchema = new Schema({
   goods: {
     type: Array,
-    requied: true,
+    requried: true,
   },
   grandTotal: {
     type: Number,

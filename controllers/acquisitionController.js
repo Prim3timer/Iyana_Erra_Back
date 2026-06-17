@@ -47,12 +47,25 @@ const createAcquisition = asyncHandler(async (req, res) => {
     neededProps.map((neededProp) => {
       newGoods.map(async (newGood) => {
         const firstQty =
-          neededProp.index == 0 ? newGood.qty + neededProp.qty : newGood.qty;
+          neededProp.index == 0
+            ? newGood.qty + neededProp.qty
+            : neededProp.qty + newGood.numerator >= newGood.denominator &&
+                neededProp.index === 1
+              ? Math.floor(
+                  (newGood.numerator + neededProp.qty) / newGood.denominator,
+                ) + newGood.qty
+              : newGood.qty;
 
         const secondQty =
-          neededProp.index == 1
+          neededProp.index == 1 &&
+          neededProp.qty + newGood.numerator < newGood.denominator
             ? newGood.numerator + neededProp.qty
-            : newGood.numerator;
+            : neededProp.index == 1 &&
+                neededProp.qty + newGood.numerator >= newGood.denominator
+              ? (neededProp.qty + newGood.numerator) % newGood.denominator
+              : newGood.numerator;
+
+        // const dynamNumer = neededProp.qty > newGood.denominator ?
         const availableQuantities = [firstQty, secondQty];
         await Item.updateOne(
           { _id: newGood._id },
@@ -60,11 +73,21 @@ const createAcquisition = asyncHandler(async (req, res) => {
             qty:
               neededProp.index == 0
                 ? newGood.qty + neededProp.qty
-                : newGood.qty,
+                : neededProp.qty + newGood.numerator >= newGood.denominator &&
+                    neededProp.index === 1
+                  ? Math.floor(
+                      (newGood.numerator + neededProp.qty) /
+                        newGood.denominator,
+                    ) + newGood.qty
+                  : newGood.qty,
             numerator:
-              neededProp.index == 1
+              neededProp.index == 1 &&
+              neededProp.qty + newGood.numerator < newGood.denominator
                 ? newGood.numerator + neededProp.qty
-                : newGood.numerator,
+                : neededProp.index == 1 &&
+                    neededProp.qty + newGood.numerator >= newGood.denominator
+                  ? (neededProp.qty + newGood.numerator) % newGood.denominator
+                  : newGood.numerator,
             availableQuantities,
           },
         );
