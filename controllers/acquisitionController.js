@@ -48,52 +48,52 @@ const createAcquisition = asyncHandler(async (req, res) => {
 
     const acquisition = await Acquisition.create(acquisitionObject);
     neededGoodsProps.map((neededGoodsProp) => {
-      newItems.map(async (newGood) => {
+      newItems.map(async (newItem) => {
         const firstQty =
           neededGoodsProp.index == 0
-            ? newGood.qty + neededGoodsProp.qty
-            : neededGoodsProp.qty + newGood.numerator >= newGood.denominator &&
+            ? newItem.qty + neededGoodsProp.qty
+            : neededGoodsProp.qty + newItem.numerator >= newItem.denominator &&
                 neededGoodsProp.index === 1
               ? Math.floor(
-                  (newGood.numerator + neededGoodsProp.qty) /
-                    newGood.denominator,
-                ) + newGood.qty
-              : newGood.qty;
+                  (newItem.numerator + neededGoodsProp.qty) /
+                    newItem.denominator,
+                ) + newItem.qty
+              : newItem.qty;
 
         const secondQty =
           neededGoodsProp.index == 1 &&
-          neededGoodsProp.qty + newGood.numerator < newGood.denominator
-            ? newGood.numerator + neededGoodsProp.qty
+          neededGoodsProp.qty + newItem.numerator < newItem.denominator
+            ? newItem.numerator + neededGoodsProp.qty
             : neededGoodsProp.index == 1 &&
-                neededGoodsProp.qty + newGood.numerator >= newGood.denominator
-              ? (neededGoodsProp.qty + newGood.numerator) % newGood.denominator
-              : newGood.numerator;
+                neededGoodsProp.qty + newItem.numerator >= newItem.denominator
+              ? (neededGoodsProp.qty + newItem.numerator) % newItem.denominator
+              : newItem.numerator;
 
-        // const dynamNumer = neededGoodsProp.qty > newGood.denominator ?
+        // const dynamNumer = neededGoodsProp.qty > newItem.denominator ?
         const availableQuantities = [firstQty, secondQty];
         await Item.updateOne(
-          { _id: newGood._id },
+          { _id: newItem._id },
           {
             qty:
               neededGoodsProp.index == 0
-                ? newGood.qty + neededGoodsProp.qty
-                : neededGoodsProp.qty + newGood.numerator >=
-                      newGood.denominator && neededGoodsProp.index === 1
+                ? newItem.qty + neededGoodsProp.qty
+                : neededGoodsProp.qty + newItem.numerator >=
+                      newItem.denominator && neededGoodsProp.index === 1
                   ? Math.floor(
-                      (newGood.numerator + neededGoodsProp.qty) /
-                        newGood.denominator,
-                    ) + newGood.qty
-                  : newGood.qty,
+                      (newItem.numerator + neededGoodsProp.qty) /
+                        newItem.denominator,
+                    ) + newItem.qty
+                  : newItem.qty,
             numerator:
               neededGoodsProp.index == 1 &&
-              neededGoodsProp.qty + newGood.numerator < newGood.denominator
-                ? newGood.numerator + neededGoodsProp.qty
+              neededGoodsProp.qty + newItem.numerator < newItem.denominator
+                ? newItem.numerator + neededGoodsProp.qty
                 : neededGoodsProp.index == 1 &&
-                    neededGoodsProp.qty + newGood.numerator >=
-                      newGood.denominator
-                  ? (neededGoodsProp.qty + newGood.numerator) %
-                    newGood.denominator
-                  : newGood.numerator,
+                    neededGoodsProp.qty + newItem.numerator >=
+                      newItem.denominator
+                  ? (neededGoodsProp.qty + newItem.numerator) %
+                    newItem.denominator
+                  : newItem.numerator,
             availableQuantities,
           },
         );
