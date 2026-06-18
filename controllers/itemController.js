@@ -1,3 +1,4 @@
+const Acquisitons = require("../models/Acquisitons");
 const Item = require("../models/Items");
 const asyncHandler = require("express-async-handler");
 
@@ -41,7 +42,6 @@ const getAllItems = asyncHandler(async (req, res) => {
   const items = await Item.find();
   res.json(items);
 });
-
 const editItem = asyncHandler(async (req, res) => {
   const id = req.params.id;
 
@@ -53,6 +53,7 @@ const editItem = asyncHandler(async (req, res) => {
     qty,
     denominator,
     numerator,
+    date,
   } = req.body;
   console.log({ reqBody: req.body, id });
   const response = await Item.updateOne({ _id: id }, req.body);

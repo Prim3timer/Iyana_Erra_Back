@@ -8,8 +8,8 @@ const corsOptions = require("./config/corsOptions");
 
 connectDB();
 
-const PORT = process.env.PORT || 4000;
-// const PORT = 4000;
+// const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 // const mongoUrl = process.env.MONGO_URL;
 
 app.use(cors(corsOptions));
