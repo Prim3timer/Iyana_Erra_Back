@@ -14,8 +14,8 @@ const createAcquisition = asyncHandler(async (req, res) => {
   });
 
   const neededGoodsProps = goods.map((good) => {
-    const { index, qty } = good;
-    return { index, qty };
+    const { index, qty, _id } = good;
+    return { index, qty, _id };
   });
 
   console.log({ neededGoodsProps });
@@ -49,54 +49,58 @@ const createAcquisition = asyncHandler(async (req, res) => {
     const acquisition = await Acquisition.create(acquisitionObject);
     neededGoodsProps.map((neededGoodsProp) => {
       newItems.map(async (newItem) => {
-        const firstQty =
-          neededGoodsProp.index == 0
-            ? newItem.qty + neededGoodsProp.qty
-            : neededGoodsProp.qty + newItem.numerator >= newItem.denominator &&
-                neededGoodsProp.index === 1
-              ? Math.floor(
-                  (newItem.numerator + neededGoodsProp.qty) /
-                    newItem.denominator,
-                ) + newItem.qty
-              : newItem.qty;
+        console.log({ neededGoodsProp });
+        if (neededGoodsProp._id == newItem._id) {
+          const firstQty =
+            neededGoodsProp.index == 0
+              ? newItem.qty + neededGoodsProp.qty
+              : neededGoodsProp.qty + newItem.numerator >=
+                    newItem.denominator && neededGoodsProp.index === 1
+                ? Math.floor(
+                    (newItem.numerator + neededGoodsProp.qty) /
+                      newItem.denominator,
+                  ) + newItem.qty
+                : newItem.qty;
 
-        const secondQty =
-          neededGoodsProp.index == 1 &&
-          neededGoodsProp.qty + newItem.numerator < newItem.denominator
-            ? newItem.numerator + neededGoodsProp.qty
-            : neededGoodsProp.index == 1 &&
-                neededGoodsProp.qty + newItem.numerator >= newItem.denominator
-              ? (neededGoodsProp.qty + newItem.numerator) % newItem.denominator
-              : newItem.numerator;
+          const secondQty =
+            neededGoodsProp.index == 1 &&
+            neededGoodsProp.qty + newItem.numerator < newItem.denominator
+              ? newItem.numerator + neededGoodsProp.qty
+              : neededGoodsProp.index == 1 &&
+                  neededGoodsProp.qty + newItem.numerator >= newItem.denominator
+                ? (neededGoodsProp.qty + newItem.numerator) %
+                  newItem.denominator
+                : newItem.numerator;
 
-        // const dynamNumer = neededGoodsProp.qty > newItem.denominator ?
-        const availableQuantities = [firstQty, secondQty];
-        await Item.updateOne(
-          { _id: newItem._id },
-          {
-            qty:
-              neededGoodsProp.index == 0
-                ? newItem.qty + neededGoodsProp.qty
-                : neededGoodsProp.qty + newItem.numerator >=
-                      newItem.denominator && neededGoodsProp.index === 1
-                  ? Math.floor(
-                      (newItem.numerator + neededGoodsProp.qty) /
-                        newItem.denominator,
-                    ) + newItem.qty
-                  : newItem.qty,
-            numerator:
-              neededGoodsProp.index == 1 &&
-              neededGoodsProp.qty + newItem.numerator < newItem.denominator
-                ? newItem.numerator + neededGoodsProp.qty
-                : neededGoodsProp.index == 1 &&
-                    neededGoodsProp.qty + newItem.numerator >=
+          // const dynamNumer = neededGoodsProp.qty > newItem.denominator ?
+          const availableQuantities = [firstQty, secondQty];
+          await Item.updateOne(
+            { _id: newItem._id },
+            {
+              qty:
+                neededGoodsProp.index == 0
+                  ? newItem.qty + neededGoodsProp.qty
+                  : neededGoodsProp.qty + newItem.numerator >=
+                        newItem.denominator && neededGoodsProp.index === 1
+                    ? Math.floor(
+                        (newItem.numerator + neededGoodsProp.qty) /
+                          newItem.denominator,
+                      ) + newItem.qty
+                    : newItem.qty,
+              numerator:
+                neededGoodsProp.index == 1 &&
+                neededGoodsProp.qty + newItem.numerator < newItem.denominator
+                  ? newItem.numerator + neededGoodsProp.qty
+                  : neededGoodsProp.index == 1 &&
+                      neededGoodsProp.qty + newItem.numerator >=
+                        newItem.denominator
+                    ? (neededGoodsProp.qty + newItem.numerator) %
                       newItem.denominator
-                  ? (neededGoodsProp.qty + newItem.numerator) %
-                    newItem.denominator
-                  : newItem.numerator,
-            availableQuantities,
-          },
-        );
+                    : newItem.numerator,
+              availableQuantities,
+            },
+          );
+        }
       });
     });
   }

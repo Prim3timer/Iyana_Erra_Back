@@ -32,7 +32,9 @@ const createItem = asyncHandler(async (req, res) => {
     const response = await Item.create(newItem);
     console.log({ response });
     console.log("item created");
-    res.json("created");
+    if (response) {
+      res.json(`${req.body.name} added`);
+    }
   } catch (error) {
     console.log(error);
   }
